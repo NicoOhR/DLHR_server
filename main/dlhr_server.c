@@ -1,6 +1,5 @@
 #include "cJSON.h"
 #include "driver/i2c_master.h"
-#include "jemi.h"
 #include <stdio.h>
 
 #define DLHR_I2C_PORT 0
@@ -30,8 +29,15 @@ void app_main(void) {
 
   ESP_ERROR_CHECK(
       i2c_master_bus_add_device(bus_handle, &dlhr_cfg, &dlhr_handle));
+
   uint8_t command[1] = {0xAA};
   uint8_t response_buf[8];
+
   ESP_ERROR_CHECK(i2c_master_transmit_receive(
       dlhr_handle, command, sizeof(command), response_buf, 8, -1));
+
+  cJSON *root, *fmt;
+  root = cJSON_CreateObject();
+  cJSON_AddItemToObject(root, "pressures", "0.000");
+  cJSON_Print(root);
 }
